@@ -51,7 +51,7 @@ domen = 'https://exist.ua/'
 # categories_urls = [domen + a.get('href') for a in categories][:-1]
 #
 # all_subcategories_urls = []
-# for category_url in categories_urls[10:]:
+# for category_url in categories_urls:
 #     req = requests.get(url=category_url, headers=headers)
 #     src = req.text
 #
@@ -65,10 +65,12 @@ domen = 'https://exist.ua/'
 #     for url in subcategories_urls:
 #         all_subcategories_urls.append(url)
 #
+#     time.sleep(1)
+#
 # all_subcategories_urls = list(set(all_subcategories_urls))
 # print(len(all_subcategories_urls))
 #
-# with open('urls.txt', 'w', encoding='utf-8') as file:
+# with open('subcategories_urls.txt', 'w', encoding='utf-8') as file:
 #     for url in all_subcategories_urls:
 #         file.write(url + '\n')
 
@@ -106,8 +108,8 @@ with open('scraper2.py', 'r+', encoding='utf-8') as file:
     with open('subcategories_urls.txt', 'r', encoding='utf-8') as urls_file:
         counter = 1
         for i in range(len(urls_file.readlines())):
-            scr[37] = f'    counter = {counter}'
-            scr[38] = f'    ind = {i}'
+            scr[36] = f'    counter = {counter}'
+            scr[37] = f'    ind = {i}'
             with open(f'scripts/script_{counter}', 'w', encoding='utf-8') as script_file:
                 for line in scr:
                     script_file.write(line)
