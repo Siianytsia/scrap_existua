@@ -108,7 +108,7 @@ with open('scraper2.py', 'r+', encoding='utf-8') as file:
     with open('subcategories_urls.txt', 'r', encoding='utf-8') as urls_file:
         counter = 1
         for i in range(len(urls_file.readlines())):
-            scr[36] = f'    counter = {counter}'
+            scr[36] = f'    counter = {counter}\n'
             scr[37] = f'    ind = {i}'
             with open(f'scripts/script_{counter}', 'w', encoding='utf-8') as script_file:
                 for line in scr:

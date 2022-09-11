@@ -34,7 +34,8 @@ domen = 'https://exist.ua/'
 
 def get_data():
 
-    counter = 193    ind = 192
+    counter = 193
+    ind = 192
     with open('../subcategories_urls.txt', 'r', encoding='utf-8') as file:
         url = file.readlines()[ind]
         req = requests.get(url=url.strip(), headers=headers)
