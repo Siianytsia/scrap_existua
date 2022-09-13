@@ -6,7 +6,6 @@ import time
 import csv
 
 
-
 def RandomUserAgent():
     user_agents = [
         'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/536.1.0 (KHTML, like Gecko) Chrome/17.0.898.0 Safari/536.1.0',
@@ -25,9 +24,30 @@ def RandomUserAgent():
     return user_agents[randint(0, len(user_agents) - 1)]
 
 
-headers = {
+main_headers = {
     'Accept': '*/*',
     'User-Agent': RandomUserAgent()
+}
+
+
+def get_proxy():
+    url = "http://free-proxy.cz/en/proxylist/country/UA/http/ping/level2"
+    soup = BS(requests.get(url, headers=main_headers).content, 'lxml')
+    proxies = []
+    for row in soup.find("table", attrs={"id": "proxy_list"}).find('tbody').find_all("tr"):
+        tds = row.find_all("td")
+        try:
+            ip = tds[0].text.strip()
+            port = tds[1].find('span').text.strip()
+            host = f'{ip}:{port}'
+            proxies.append(host)
+        except IndexError:
+            continue
+    return f'http://{proxies[randint(0, len(proxies) - 1)]}'
+
+
+main_proxy = {
+    'http': get_proxy()
 }
 
 domen = 'https://exist.ua/'
@@ -38,14 +58,14 @@ def get_data():
     ind = 180
     with open('subcategories_urls.txt', 'r', encoding='utf-8') as file:
         url = file.readlines()[ind]
-        req = requests.get(url=url.strip(), headers=headers)
+        req = requests.get(url=url.strip(), headers=main_headers, proxies=main_proxy)
         src = req.text
         soup = BS(src, 'lxml')
 
         pages_amount = int(soup.find('a', {'aria-label': 'lastPage'}).text)
         print(pages_amount)
 
-        with open(f'data/product_{counter}.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        with open(f'data\product_{counter}.csv', 'w', newline='', encoding='utf-8') as csvfile:
             wrt = csv.writer(csvfile)
             wrt.writerow(
                 (
@@ -59,50 +79,71 @@ def get_data():
             )
 
             for i in range(1, pages_amount):
-                pagination_url = url[:-2] + f'?page={i}'
-                req = requests.get(url=pagination_url, headers=headers)
-                src = req.text
-                soup = BS(src, 'lxml')
-
-                urls_ = soup.find_all('div', {'class': 'ListItemstyle__CatalogueListItemImageWrapper-sc-1gf1g4g-1'})
-                urls = [domen + a.find('a').get('href') for a in urls_]
-
-                for u in urls:
-                    req = requests.get(url=u.strip(), headers=headers)
-                    if str(req) != '<Response [200]>':
-                        continue
-
+                headers = {
+                    'Accept': '*/*',
+                    'User-Agent': RandomUserAgent()
+                }
+                proxies = {
+                    'http': get_proxy()
+                }
+                try:
+                    pagination_url = url[:-2] + f'?page={i}'
+                    req = requests.get(url=pagination_url, headers=headers, proxies=proxies)
                     src = req.text
                     soup = BS(src, 'lxml')
 
-                    vencode = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0].split()[-1] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
-                    brand = soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong').text if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0] is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong') is not None else ' '
-                    name = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
-                    photo_link = soup.find('div', {'data-slide': 'true'}).find('img').get('src') if soup.find('div', {'data-slide': 'true'}) is not None and soup.find('div', {'data-slide': 'true'}).find('img') is not None else ' '
-                    characteristics_list = soup.find('div', {'class': 'ProductCollapsiblestyle__ProductBlockDropdown-sc-1xnxr5e-0', 'data-active': 'false'}).find_all('td')
+                    urls_ = soup.find_all('div', {'class': 'ListItemstyle__CatalogueListItemImageWrapper-sc-1gf1g4g-1'})
+                    urls = [domen + a.find('a').get('href') for a in urls_]
 
-                    characteristics_list = [i.text for i in characteristics_list]
-                    characteristics = ''
-                    for _ in range(0, len(characteristics_list)-1, 2):
-                        characteristics += f'Автозапчастини:{characteristics_list[_]}{characteristics_list[_ + 1]}|\n'
+                    for u in urls:
+                        header = {
+                            'Accept': '*/*',
+                            'User-Agent': RandomUserAgent()
+                        }
+                        proxy = {
+                            'http': get_proxy()
+                        }
+                        try:
+                            req = requests.get(url=u.strip(), headers=header, proxies=proxy)
+                            if str(req) != '<Response [200]>':
+                                print(req)
+                                continue
 
-                    analogue_list = soup.find('div', {'id': 'analogOffers'}).find('tbody').find_all('tr') if soup.find('div', {'id': 'analogOffers'}) is not None and soup.find('div', {'id': 'analogOffers'}).find('tbody') is not None else []
-                    analogue = ''
-                    if analogue_list:
-                        for item in analogue_list:
-                            analogue += f"{item.find('td', {'data-field': 'Найменування'}).find('p').find('strong').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '} {item.find('td', {'data-field': 'Найменування'}).find('p').find('a').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '}|\n"
+                            src = req.text
+                            soup = BS(src, 'lxml')
 
-                    wrt.writerow(
-                        (
-                            vencode,
-                            brand,
-                            name,
-                            photo_link,
-                            characteristics,
-                            analogue
-                        )
-                    )
-                time.sleep(0.5)
+                            vencode = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0].split()[-1] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
+                            brand = soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong').text if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0] is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong') is not None else ' '
+                            name = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
+                            photo_link = soup.find('div', {'data-slide': 'true'}).find('img').get('src') if soup.find('div', {'data-slide': 'true'}) is not None and soup.find('div', {'data-slide': 'true'}).find('img') is not None else ' '
+                            characteristics_list = soup.find('div', {'class': 'ProductCollapsiblestyle__ProductBlockDropdown-sc-1xnxr5e-0', 'data-active': 'false'}).find_all('td')
+
+                            characteristics_list = [i.text for i in characteristics_list]
+                            characteristics = ''
+                            for _ in range(0, len(characteristics_list)-1, 2):
+                                characteristics += f'Автозапчастини:{characteristics_list[_]}{characteristics_list[_ + 1]}|\n'
+
+                            analogue_list = soup.find('div', {'id': 'analogOffers'}).find('tbody').find_all('tr') if soup.find('div', {'id': 'analogOffers'}) is not None and soup.find('div', {'id': 'analogOffers'}).find('tbody') is not None else []
+                            analogue = ''
+                            if analogue_list:
+                                for item in analogue_list:
+                                    analogue += f"{item.find('td', {'data-field': 'Найменування'}).find('p').find('strong').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '} {item.find('td', {'data-field': 'Найменування'}).find('p').find('a').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '}|\n"
+
+                            wrt.writerow(
+                                (
+                                    vencode,
+                                    brand,
+                                    name,
+                                    photo_link,
+                                    characteristics,
+                                    analogue
+                                )
+                            )
+                        except requests.adapters.ConnectionError:
+                            time.sleep(1)
+
+                except requests.adapters.ConnectionError:
+                    time.sleep(1)
 
 def main():
     get_data()
