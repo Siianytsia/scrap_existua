@@ -31,19 +31,14 @@ main_headers = {
 
 
 def get_proxy():
-    url = "http://free-proxy.cz/en/proxylist/country/UA/http/ping/level2"
-    soup = BS(requests.get(url, headers=main_headers).content, 'lxml')
-    proxies = []
-    for row in soup.find("table", attrs={"id": "proxy_list"}).find('tbody').find_all("tr"):
-        tds = row.find_all("td")
-        try:
-            ip = tds[0].text.strip()
-            port = tds[1].find('span').text.strip()
-            host = f'{ip}:{port}'
-            proxies.append(host)
-        except IndexError:
-            continue
-    return f'http://{proxies[randint(0, len(proxies) - 1)]}'
+    proxies_list = [
+        'http://29696:Pw4hVnq1@195.123.255.146:2831/',
+        'http://29696:Pw4hVnq1@195.123.199.142:2831/',
+        'http://29696:Pw4hVnq1@185.112.15.68:2831/',
+        'http://29696:Pw4hVnq1@195.123.194.31:2831/',
+        'http://29696:Pw4hVnq1@185.112.12.225:2831/',
+    ]
+    return proxies_list[randint(0, len(proxies_list) - 1)]
 
 
 main_proxy = {
@@ -54,9 +49,8 @@ domen = 'https://exist.ua/'
 
 def get_data():
 
-    counter = 1
-    ind = 0
-
+    counter = 2
+    ind = 1
     with open('subcategories_urls.txt', 'r', encoding='utf-8') as file:
         url = file.readlines()[ind]
         req = requests.get(url=url.strip(), headers=main_headers, proxies=main_proxy)
@@ -79,7 +73,7 @@ def get_data():
                 )
             )
 
-            for i in range(1, pages_amount):
+            for i in range(1, pages_amount+1):
                 headers = {
                     'Accept': '*/*',
                     'User-Agent': RandomUserAgent()
@@ -87,6 +81,7 @@ def get_data():
                 proxies = {
                     'http': get_proxy()
                 }
+                print(proxies)
                 try:
                     pagination_url = url[:-2] + f'?page={i}'
                     req = requests.get(url=pagination_url, headers=headers, proxies=proxies)
@@ -104,11 +99,14 @@ def get_data():
                         proxy = {
                             'http': get_proxy()
                         }
+                        print(proxy)
                         try:
                             req = requests.get(url=u.strip(), headers=header, proxies=proxy)
                             if str(req) != '<Response [200]>':
                                 print(req)
-                                continue
+                                time.sleep(1)
+                                req = requests.get(url=u.strip(), headers=header, proxies=proxy)
+                                print(req)
 
                             src = req.text
                             soup = BS(src, 'lxml')
