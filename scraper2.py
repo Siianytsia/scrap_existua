@@ -42,7 +42,8 @@ def get_proxy():
 
 
 main_proxy = {
-    'http': get_proxy()
+    'http': get_proxy(),
+    'https': get_proxy()
 }
 
 domen = 'https://exist.ua/'
@@ -80,7 +81,8 @@ def get_data():
                     'User-Agent': RandomUserAgent()
                 }
                 proxies = {
-                    'http': get_proxy()
+                    'http': get_proxy(),
+                    'https': get_proxy()
                 }
                 try:
                     pagination_url = url[:-2] + f'?page={i}'
@@ -97,7 +99,8 @@ def get_data():
                             'User-Agent': RandomUserAgent()
                         }
                         proxy = {
-                            'http': get_proxy()
+                            'http': get_proxy(),
+                            'https': get_proxy()
                         }
                         try:
                             req = requests.get(url=u.strip(), headers=header, proxies=proxy)
