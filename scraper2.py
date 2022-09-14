@@ -104,7 +104,9 @@ def get_data():
                             if str(req) != '<Response [200]>':
                                 print(req)
                                 time.sleep(1)
-                                req = requests.get(url=u.strip(), headers=header, proxies=proxy)
+                                while str(req) != '<Response [200]>':
+                                    req = requests.get(url=u.strip(), headers=header, proxies=proxy)
+                                    time.sleep(1)
                                 print(req)
 
                             src = req.text
