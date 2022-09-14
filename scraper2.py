@@ -61,7 +61,7 @@ def get_data():
         pages_amount = int(soup.find('a', {'aria-label': 'lastPage'}).text)
         print(pages_amount)
 
-        with open(f'data\product_{counter}.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        with open(f'data/product_{counter}.csv', 'w', newline='', encoding='utf-8') as csvfile:
             wrt = csv.writer(csvfile)
             wrt.writerow(
                 (
@@ -82,7 +82,6 @@ def get_data():
                 proxies = {
                     'http': get_proxy()
                 }
-                print(proxies)
                 try:
                     pagination_url = url[:-2] + f'?page={i}'
                     req = requests.get(url=pagination_url, headers=headers, proxies=proxies)
@@ -100,7 +99,6 @@ def get_data():
                         proxy = {
                             'http': get_proxy()
                         }
-                        print(proxy)
                         try:
                             req = requests.get(url=u.strip(), headers=header, proxies=proxy)
                             if str(req) != '<Response [200]>':
