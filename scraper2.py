@@ -128,7 +128,7 @@ def GetData():
                             vencode = soup.find('p', {'class': 'expert-numbers'}).text.split()[-1]
                         elif soup.find_all('div', {'class': 'card-characts-list-item'}):
                             if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                            'class': 'card-characts-list-item__text'}):
+                                'class': 'card-characts-list-item__text'}):
                                 vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
                                     'class': 'card-characts-list-item__text'}).text.strip()
                         else:
@@ -147,17 +147,24 @@ def GetData():
                             name = ' '.join(name)
 
                         # Ссылка на фото
-                        photo_link = soup.find('div', {'class': 'card-gallery-big'}).find('img').get('content')
+                        photo_link = ' '
+                        if soup.find('div', {'class': 'card-gallery-big'}) and soup.find('div', {
+                            'class': 'card-gallery-big'}).find('img'):
+                            photo_link = soup.find('div', {'class': 'card-gallery-big'}).find('img').get('content')
 
                         # Характеристики
-                        characteristics_list = soup.find('section', {'class': 'card-characts'}).find('div', {
-                            'class': 'card-characts-list'}).find_all('div', {'class': 'card-characts-list-item'})
-                        characteristics_list = [
-                            f"Автозапчастини:{item.find('span', {'class': 'mistake-char-title'}).text.strip()}: {item.find('div', {'class': 'card-characts-list-item__text'}).text.strip()}|\n"
-                            for item in characteristics_list
-                        ]
+                        characteristics_list = ' '
+                        if soup.find('section', {'class': 'card-characts'}) and soup.find('section', {
+                            'class': 'card-characts'}).find('div', {
+                            'class': 'card-characts-list'}):
+                            characteristics_list = soup.find('section', {'class': 'card-characts'}).find('div', {
+                                'class': 'card-characts-list'}).find_all('div', {'class': 'card-characts-list-item'})
+                            characteristics_list = [
+                                f"Автозапчастини:{item.find('span', {'class': 'mistake-char-title'}).text.strip()}: {item.find('div', {'class': 'card-characts-list-item__text'}).text.strip()}|\n"
+                                for item in characteristics_list
+                            ]
 
-                        characteristics_list = ''.join(characteristics_list)
+                            characteristics_list = ''.join(characteristics_list)
 
                         # Аналоги
                         analogue_list = ' '

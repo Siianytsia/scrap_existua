@@ -10,7 +10,28 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\data\Двигун_і_Система_вихлопу\Каталізатор.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\data\Запчастини_для_ТО\Гальмові_колодки.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\data\Запчастини_для_ТО\Моторна_олива.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=":" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="\data\Запчастини_для_ТО\Наконечник_кермової_тяги.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
