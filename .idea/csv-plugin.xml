@@ -10,21 +10,7 @@
             </Attribute>
           </value>
         </entry>
-        <entry key="\data\product_1.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\data\product_2.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="\data\product_4.csv">
+        <entry key="\data\Запчастини_для_ТО\Гальмові_колодки.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

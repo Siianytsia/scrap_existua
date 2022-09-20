@@ -38,8 +38,8 @@ def GetProxy():
 
 
 def GetData():
+    ind = 6
 
-    ind = 91
     main_headers = {
         'Accept': '*/*',
         'User-Agent': RandomUserAgent()
@@ -75,7 +75,7 @@ def GetData():
                 )
             )
 
-            for i in range(1, pages_amount + 1):
+            for i in range(1, 10): # pages_amount + 1
                 headers = {
                     'Accept': '*/*',
                     'User-Agent': RandomUserAgent()
@@ -125,11 +125,10 @@ def GetData():
                         # Артикул
                         if soup.find('p', {'class': 'expert-numbers'}):
                             vencode = soup.find('p', {'class': 'expert-numbers'}).text.split()[-1]
-                        elif soup.find_all('div', {'class': 'card-characts-list-item'}):
-                            if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                        elif soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
                             'class': 'card-characts-list-item__text'}):
-                                vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                                    'class': 'card-characts-list-item__text'}).text.strip()
+                            vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                                'class': 'card-characts-list-item__text'}).text.strip()
                         else:
                             vencode = 'Артикул не найден'
 
@@ -171,7 +170,6 @@ def GetData():
 
                         # Марка
                         marks = ''
-                        marks_table = []
                         if soup.find('div', {'class': 'expert-applicability-wrap'}):
                             marks_table = soup.find('div', {'class': 'expert-applicability-wrap'}).find_all('div', {
                                 'class': 'expert-applicability'})

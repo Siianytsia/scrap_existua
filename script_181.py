@@ -1,9 +1,11 @@
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup as BS
 from random import randint
-from datetime import datetime
 import time
 import csv
+
+domen = 'https://dok.ua'
 
 
 def RandomUserAgent():
@@ -24,13 +26,7 @@ def RandomUserAgent():
     return user_agents[randint(0, len(user_agents) - 1)]
 
 
-main_headers = {
-    'Accept': '*/*',
-    'User-Agent': RandomUserAgent()
-}
-
-
-def get_proxy():
+def GetProxy():
     proxies_list = [
         'http://29696:Pw4hVnq1@195.123.255.146:2831/',
         'http://29696:Pw4hVnq1@195.123.199.142:2831/',
@@ -41,27 +37,30 @@ def get_proxy():
     return proxies_list[randint(0, len(proxies_list) - 1)]
 
 
-main_proxy = {
-    'http': get_proxy(),
-    'https': get_proxy()
-}
+def GetData():
 
-domen = 'https://exist.ua/'
-
-def get_data():
-
-    counter = 181
     ind = 180
-    with open('subcategories_urls.txt', 'r', encoding='utf-8') as file:
-        url = file.readlines()[ind]
-        req = requests.get(url=url.strip(), headers=main_headers, proxies=main_proxy)
-        src = req.text
-        soup = BS(src, 'lxml')
+    main_headers = {
+        'Accept': '*/*',
+        'User-Agent': RandomUserAgent()
+    }
 
-        pages_amount = int(soup.find('a', {'aria-label': 'lastPage'}).text)
+    main_proxy = {
+        'http': GetProxy(),
+        'https': GetProxy()
+    }
+
+    with open('categories_urls.txt', 'r', encoding='utf-8') as file:
+        info = file.readlines()[ind].split()
+        url = info[2]
+        print(url)
+        req = requests.get(url=url, headers=main_headers, proxies=main_proxy)
+        soup = BS(req.text, 'lxml')
+
+        pages_amount = int(soup.find('li', {'class': 'last'}).find('a').text)
         print(pages_amount)
 
-        with open(f'data/product_{counter}.csv', 'w', newline='', encoding='utf-8') as csvfile:
+        with open(f'data/{info[0]}/{info[1]}.csv', 'w', newline='', encoding='utf-8') as csvfile:
             wrt = csv.writer(csvfile)
             wrt.writerow(
                 (
@@ -70,89 +69,154 @@ def get_data():
                     'Название',
                     'Ссылка на фото',
                     'Характеристики',
-                    'Аналоги'
+                    'Аналоги',
+                    'Марка',
+                    'Модель'
                 )
             )
 
-            for i in range(1, pages_amount+1):
+            for i in range(1, pages_amount + 1):
                 headers = {
                     'Accept': '*/*',
                     'User-Agent': RandomUserAgent()
                 }
+
                 proxies = {
-                    'http': get_proxy(),
-                    'https': get_proxy()
+                    'http': GetProxy(),
+                    'https': GetProxy()
                 }
+
                 try:
-                    pagination_url = url[:-2] + f'?page={i}'
+                    pagination_url = url + f'?page={i}'
                     req = requests.get(url=pagination_url, headers=headers, proxies=proxies)
-                    src = req.text
-                    soup = BS(src, 'lxml')
+                    soup = BS(req.text, 'lxml')
 
-                    urls_ = soup.find_all('div', {'class': 'ListItemstyle__CatalogueListItemImageWrapper-sc-1gf1g4g-1'})
-                    urls = [domen + a.find('a').get('href') for a in urls_]
+                    products_urls = soup.find_all('a', {'class': 'product-card__layout-name'})
+                    products_urls = [
+                        (domen + a.get('href'), a.find('span', {'class': 'product-card__title'}).text.strip())
+                        for a in products_urls if a.get('href')
+                    ]
+                    for item in products_urls:
+                        u = item[0]
 
-                    for u in urls:
                         header = {
                             'Accept': '*/*',
                             'User-Agent': RandomUserAgent()
                         }
+
                         proxy = {
-                            'http': get_proxy(),
-                            'https': get_proxy()
+                            'http': GetProxy(),
+                            'https': GetProxy()
                         }
-                        try:
-                            req = requests.get(url=u.strip(), headers=header, proxies=proxy)
-                            if str(req) != '<Response [200]>':
-                                print(req)
-                                time.sleep(1)
-                                while str(req) != '<Response [200]>':
-                                    req = requests.get(url=u.strip(), headers=header, proxies=proxy)
-                                    time.sleep(1)
-                                print(req)
 
-                            src = req.text
-                            soup = BS(src, 'lxml')
+                        req = requests.get(url=u, headers=header, proxies=proxy)
+                        if str(req) == '<Response [404]>' or str(req) == '<Response [403]>':
+                            print(req)
+                            continue
+                        if str(req) != '<Response [200]>':
+                            print(req)
+                            while str(req) != '<Response [200]>':
+                                req = requests.get(url=u.strip(), headers=header, proxies=proxy)
+                                time.sleep(0.3)
+                            print(req)
 
-                            vencode = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0].split()[-1] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
-                            brand = soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong').text if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0] is not None and soup.find('div', {'id': 'page-title'}).find_all('span')[0].find('strong') is not None else ' '
-                            name = soup.find('div', {'id': 'page-title'}).find('h1').text.split('\xa0')[0] if soup.find('div', {'id': 'page-title'}) is not None and soup.find('div', {'id': 'page-title'}).find('h1') is not None else ' '
-                            photo_link = soup.find('div', {'data-slide': 'true'}).find('img').get('src') if soup.find('div', {'data-slide': 'true'}) is not None and soup.find('div', {'data-slide': 'true'}).find('img') is not None else ' '
-                            characteristics_list = soup.find('div', {'class': 'ProductCollapsiblestyle__ProductBlockDropdown-sc-1xnxr5e-0', 'data-active': 'false'}).find_all('td')
+                        soup = BS(req.text, 'lxml')
 
-                            characteristics_list = [i.text for i in characteristics_list]
-                            characteristics = ''
-                            for _ in range(0, len(characteristics_list)-1, 2):
-                                characteristics += f'Автозапчастини:{characteristics_list[_]}{characteristics_list[_ + 1]}|\n'
+                        # Артикул
+                        if soup.find('p', {'class': 'expert-numbers'}):
+                            vencode = soup.find('p', {'class': 'expert-numbers'}).text.split()[-1]
+                        elif soup.find_all('div', {'class': 'card-characts-list-item'}):
+                            if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                            'class': 'card-characts-list-item__text'}):
+                                vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                                    'class': 'card-characts-list-item__text'}).text.strip()
+                        else:
+                            vencode = 'Артикул не найден'
 
-                            analogue_list = soup.find('div', {'id': 'analogOffers'}).find('tbody').find_all('tr') if soup.find('div', {'id': 'analogOffers'}) is not None and soup.find('div', {'id': 'analogOffers'}).find('tbody') is not None else []
-                            analogue = ''
-                            if analogue_list:
-                                for item in analogue_list:
-                                    analogue += f"{item.find('td', {'data-field': 'Найменування'}).find('p').find('strong').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '} {item.find('td', {'data-field': 'Найменування'}).find('p').find('a').text if item.find('td', {'data-field': 'Найменування'}) is not None and item.find('td', {'data-field': 'Найменування'}).find('p') else ' '}|\n"
+                        # Бренд
+                        brand = item[1]
 
-                            wrt.writerow(
-                                (
-                                    vencode,
-                                    brand,
-                                    name,
-                                    photo_link,
-                                    characteristics,
-                                    analogue
-                                )
+                        # Название
+                        if soup.find('div', {'class': 'card-title-box'}).find('h1').find('strong').text:
+                            name = soup.find('div', {'class': 'card-title-box'}).find('h1').find('strong').text
+                        else:
+                            name = soup.find('div', {'class': 'card-title-box'}).find('h1').find('strong').find_all(
+                                'span')
+                            name = [t.text for t in name]
+                            name = ' '.join(name)
+
+                        # Ссылка на фото
+                        photo_link = soup.find('div', {'class': 'card-gallery-big'}).find('img').get('content')
+
+                        # Характеристики
+                        characteristics_list = soup.find('section', {'class': 'card-characts'}).find('div', {
+                            'class': 'card-characts-list'}).find_all('div', {'class': 'card-characts-list-item'})
+                        characteristics_list = [
+                            f"Автозапчастини:{item.find('span', {'class': 'mistake-char-title'}).text.strip()}: {item.find('div', {'class': 'card-characts-list-item__text'}).text.strip()}|\n"
+                            for item in characteristics_list
+                        ]
+
+                        characteristics_list = ''.join(characteristics_list)
+
+                        # Аналоги
+                        analogue_list = ' '
+                        if soup.find('div', {'class': 'expert-analogs'}):
+                            analogue_list = soup.find('div', {'class': 'expert-analogs'}).find('div', {
+                                'class': 'catalog__product-list-row'}).find_all('div', {'class': 'product-card'})
+                            analogue_list = [
+                                f"{item.find('span', {'class': 'product-card__title'}).text.strip()} {item.find('span', {'class': 'product-card__serie'}).text.strip()[1:-1]}|\n"
+                                for item in analogue_list
+                            ]
+                            analogue_list = ''.join(analogue_list)
+
+                        # Марка
+                        marks = ''
+                        marks_table = []
+                        if soup.find('div', {'class': 'expert-applicability-wrap'}):
+                            marks_table = soup.find('div', {'class': 'expert-applicability-wrap'}).find_all('div', {
+                                'class': 'expert-applicability'})
+                            marks = [
+                                f"{item.find('div', {'class': 'expert-applicability-title'}).get('id')}|\n"
+                                for item in marks_table
+                            ]
+                            marks = ''.join(marks)
+
+                        # модель
+                        model = ''
+                        if marks_table:
+                            for mark in marks_table:
+                                models_table = mark.find('table', {'class': 'expert-applicability-table'}).find_all(
+                                    'tr', {'class': 'expert-applicability-table-tr_link'})
+                                models_table = [
+                                    f"{m.find('td', {'class': 'expert-applicability-table-model'}).find('span').text.strip()} {m.find('td', {'class': 'expert-applicability-table-body'}).text.strip()} {m.find('td', {'class': 'expert-applicability-table-release'}).text.strip()},\n"
+                                    for m in models_table
+                                ]
+                                models_table = list(set(models_table))
+                                for m in models_table:
+                                    model += m
+                                model = model[:-2] + '|\n'
+
+                        wrt.writerow(
+                            (
+                                vencode,
+                                brand,
+                                name,
+                                photo_link,
+                                characteristics_list,
+                                analogue_list,
+                                marks,
+                                model
                             )
-                        except requests.adapters.ConnectionError:
-                            time.sleep(1)
-
+                        )
                 except requests.adapters.ConnectionError:
                     time.sleep(1)
 
+
 def main():
-    get_data()
+    start_time = datetime.now()
+    GetData()
+    print(datetime.now() - start_time)
+
 
 if __name__ == '__main__':
     main()
-
-
-
-

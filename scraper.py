@@ -57,10 +57,7 @@ domen = 'https://exist.ua/'
 #
 #     soup = BS(src, 'lxml')
 #
-#     subcategories = soup.find_all('a', {'class': 'SparePartsItemstyle__SparePartsItemContainer-sc-4bv2fg-1'})
-#
-#     subcategories_urls = [domen + a.get('href') for a in subcategories]
-#     print(subcategories_urls)
+
 #
 #     for url in subcategories_urls:
 #         all_subcategories_urls.append(url)
@@ -108,8 +105,7 @@ with open('scraper2.py', 'r+', encoding='utf-8') as file:
     with open('subcategories_urls.txt', 'r', encoding='utf-8') as urls_file:
         counter = 1
         for i in range(len(urls_file.readlines())):
-            scr[52] = f'    counter = {counter}\n'
-            scr[53] = f'    ind = {i}'
+            scr[41] = f'    ind = {i}'
             with open(f'scripts/script_{counter}', 'w', encoding='utf-8') as script_file:
                 for line in scr:
                     script_file.write(line)
