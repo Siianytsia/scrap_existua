@@ -39,7 +39,7 @@ def GetProxy():
 
 def GetData():
 
-    ind = 3
+    ind = 3    
     main_headers = {
         'Accept': '*/*',
         'User-Agent': RandomUserAgent()
@@ -126,12 +126,13 @@ def GetData():
                         if soup.find('p', {'class': 'expert-numbers'}):
                             vencode = soup.find('p', {'class': 'expert-numbers'}).text.split()[-1]
                         elif soup.find_all('div', {'class': 'card-characts-list-item'}):
-                            if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                                'class': 'card-characts-list-item__text'}):
-                                vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                                    'class': 'card-characts-list-item__text'}).text.strip()
+                            if len(soup.find_all('div', {'class': 'card-characts-list-item'})) >= 2:
+                                if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                                    'class': 'card-characts-list-item__text'}):
+                                    vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
+                                        'class': 'card-characts-list-item__text'}).text.strip()
                         else:
-                            vencode = 'Артикул не найден'
+                            vencode = ' '
 
                         # Бренд
                         brand = item[1]
