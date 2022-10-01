@@ -1,36 +1,36 @@
-import requests
-from bs4 import BeautifulSoup as BS
-from random import randint
-import time
-
-
-
-def RandomUserAgent():
-    user_agents = [ 'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/536.1.0 (KHTML, like Gecko) Chrome/17.0.898.0 Safari/536.1.0',
-                    'Mozilla/5.0 (Windows; U; Windows NT 6.1) AppleWebKit/537.0.1 (KHTML, like Gecko) Chrome/36.0.845.0 Safari/537.0.1',
-                    'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_8_6 rv:5.0; AB) AppleWebKit/538.2.1 (KHTML, like Gecko) Version/7.1.10 Safari/538.2.1',
-                    'Mozilla/5.0 (Windows; U; Windows NT 6.2) AppleWebKit/535.0.1 (KHTML, like Gecko) Chrome/14.0.853.0 Safari/535.0.1',
-                    'Mozilla/5.0 (Windows; U; Windows NT 5.3) AppleWebKit/535.1.1 (KHTML, like Gecko) Chrome/26.0.809.0 Safari/535.1.1',
-                    'Mozilla/5.0 (Windows; U; Windows NT 6.0) AppleWebKit/532.0.2 (KHTML, like Gecko) Chrome/34.0.855.0 Safari/532.0.2',
-                    'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/531.1.1 (KHTML, like Gecko) Chrome/26.0.850.0 Safari/531.1.1',
-                    'Mozilla/5.0 (Windows; U; Windows NT 5.2) AppleWebKit/537.2.1 (KHTML, like Gecko) Chrome/31.0.838.0 Safari/537.2.1',
-                    'Mozilla/5.0 (Windows; U; Windows NT 6.1) AppleWebKit/537.1.1 (KHTML, like Gecko) Chrome/15.0.801.0 Safari/537.1.1',
-                    'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 5.2; Trident/5.1; .NET CLR 3.1.38130.6)',
-                    'Opera/9.36 (Windows NT 6.0; U; LT Presto/2.9.185 Version/10.00)',
-                    'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_7_5 rv:5.0; TR) AppleWebKit/536.2.0 (KHTML, like Gecko) Version/4.0.0 Safari/536.2.0']
-
-    return user_agents[randint(0, len(user_agents) - 1)]
-
-
-headers = {
-    'Accept': '*/*',
-    'User-Agent': RandomUserAgent()
-}
-
-domen = 'https://exist.ua/'
-
-## получение html-кода главной страницы
-
+# import requests
+# from bs4 import BeautifulSoup as BS
+# from random import randint
+# import time
+#
+#
+#
+# def RandomUserAgent():
+#     user_agents = [ 'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/536.1.0 (KHTML, like Gecko) Chrome/17.0.898.0 Safari/536.1.0',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 6.1) AppleWebKit/537.0.1 (KHTML, like Gecko) Chrome/36.0.845.0 Safari/537.0.1',
+#                     'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_8_6 rv:5.0; AB) AppleWebKit/538.2.1 (KHTML, like Gecko) Version/7.1.10 Safari/538.2.1',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 6.2) AppleWebKit/535.0.1 (KHTML, like Gecko) Chrome/14.0.853.0 Safari/535.0.1',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 5.3) AppleWebKit/535.1.1 (KHTML, like Gecko) Chrome/26.0.809.0 Safari/535.1.1',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 6.0) AppleWebKit/532.0.2 (KHTML, like Gecko) Chrome/34.0.855.0 Safari/532.0.2',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 5.1) AppleWebKit/531.1.1 (KHTML, like Gecko) Chrome/26.0.850.0 Safari/531.1.1',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 5.2) AppleWebKit/537.2.1 (KHTML, like Gecko) Chrome/31.0.838.0 Safari/537.2.1',
+#                     'Mozilla/5.0 (Windows; U; Windows NT 6.1) AppleWebKit/537.1.1 (KHTML, like Gecko) Chrome/15.0.801.0 Safari/537.1.1',
+#                     'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 5.2; Trident/5.1; .NET CLR 3.1.38130.6)',
+#                     'Opera/9.36 (Windows NT 6.0; U; LT Presto/2.9.185 Version/10.00)',
+#                     'Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_7_5 rv:5.0; TR) AppleWebKit/536.2.0 (KHTML, like Gecko) Version/4.0.0 Safari/536.2.0']
+#
+#     return user_agents[randint(0, len(user_agents) - 1)]
+#
+#
+# headers = {
+#     'Accept': '*/*',
+#     'User-Agent': RandomUserAgent()
+# }
+#
+# domen = 'https://exist.ua/'
+#
+# # получение html-кода главной страницы
+#
 # url = 'https://exist.ua/uk/avtozapchastyny/'
 #
 # req = requests.get(url=url, headers=headers)
@@ -38,15 +38,16 @@ domen = 'https://exist.ua/'
 #
 # with open('src.html', 'w', encoding='utf-8') as file:
 #     file.write(src)
-
-## получение файла с ссылками
-
+#
+# # получение файла с ссылками
+#
 # with open('src.html', 'r', encoding='utf-8') as file:
 #     src = file.read()
 #
 # soup = BS(src, 'lxml')
 #
 # categories = soup.find('div', class_='SparePartsstyle__SparePartsCatalogue-sc-13m5cdy-0').find_all('a')
+# name = soup.find()
 #
 # categories_urls = [domen + a.get('href') for a in categories][:-1]
 #
@@ -56,9 +57,9 @@ domen = 'https://exist.ua/'
 #     src = req.text
 #
 #     soup = BS(src, 'lxml')
-#
 
-#
+
+
 #     for url in subcategories_urls:
 #         all_subcategories_urls.append(url)
 #
@@ -100,14 +101,5 @@ domen = 'https://exist.ua/'
 #                 f.write(line+'\n')
 #         counter += 1
 
-with open('scraper2.py', 'r+', encoding='utf-8') as file:
-    scr = file.readlines()
-    with open('subcategories_urls.txt', 'r', encoding='utf-8') as urls_file:
-        counter = 1
-        for i in range(len(urls_file.readlines())):
-            scr[41] = f'    ind = {i}'
-            with open(f'scripts/script_{counter}', 'w', encoding='utf-8') as script_file:
-                for line in scr:
-                    script_file.write(line)
-            counter += 1
+
 

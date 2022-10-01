@@ -39,7 +39,7 @@ def GetProxy():
 
 def GetData():
 
-    ind = 15    
+    ind = 15
     main_headers = {
         'Accept': '*/*',
         'User-Agent': RandomUserAgent()
@@ -67,7 +67,6 @@ def GetData():
                     'Артикул',
                     'Бренд',
                     'Название',
-                    'Ссылка на фото',
                     'Характеристики',
                     'Аналоги',
                     'Марка',
@@ -123,16 +122,15 @@ def GetData():
                         soup = BS(req.text, 'lxml')
 
                         # Артикул
+                        vencode = ' '
                         if soup.find('p', {'class': 'expert-numbers'}):
                             vencode = soup.find('p', {'class': 'expert-numbers'}).text.split()[-1]
-                        elif soup.find_all('div', {'class': 'card-characts-list-item'}):
-                            if len(soup.find_all('div', {'class': 'card-characts-list-item'})) >= 2:
-                                if soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                                    'class': 'card-characts-list-item__text'}):
-                                    vencode = soup.find_all('div', {'class': 'card-characts-list-item'})[1].find('div', {
-                                        'class': 'card-characts-list-item__text'}).text.strip()
-                        else:
-                            vencode = ' '
+                        elif soup.find('div', {'class': 'card-body'}):
+                            if len(soup.find('div', {'class': 'card-body'}).find('h2', {
+                                'class': 'card-body__title'}).text.split()) >= 3:
+                                vencode = soup.find('div', {'class': 'card-body'}).find('h2', {
+                                    'class': 'card-body__title'}).text.split()[-1]
+                        print(vencode)
 
                         # Бренд
                         brand = item[1]
@@ -209,7 +207,6 @@ def GetData():
                                 vencode,
                                 brand,
                                 name,
-                                photo_link,
                                 characteristics_list,
                                 analogue_list,
                                 marks,
